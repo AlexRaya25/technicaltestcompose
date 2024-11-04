@@ -10,4 +10,7 @@ java {
 
 dependencies {
     implementation(kotlin("stdlib-jdk7"))
+
+    // Pruebas unitarias
+    testImplementation(libs.junit)
 }
