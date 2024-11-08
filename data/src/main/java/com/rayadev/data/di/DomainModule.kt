@@ -9,23 +9,19 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-class DomainModule {  // Note: Changed to non-abstract class
+    @Module
+    @InstallIn(SingletonComponent::class)
+    object DomainModule {
 
-    @Provides
-    @Singleton
-    fun bindUserRepository(
-        userRepositoryImpl: UserRepositoryImpl
-    ): UserRepository {
-        return userRepositoryImpl
-    }
+        @Provides
+        @Singleton
+        fun provideUserRepository(
+            userRepositoryImpl: UserRepositoryImpl
+        ): UserRepository = userRepositoryImpl
 
-    @Provides
-    @Singleton
-    fun provideGetUserUseCase(
-        userRepository: UserRepository
-    ): GetUserUseCase {
-        return GetUserUseCase(userRepository)
+        @Provides
+        @Singleton
+        fun provideGetUserUseCase(
+            userRepository: UserRepository
+        ): GetUserUseCase = GetUserUseCase(userRepository)
     }
-}

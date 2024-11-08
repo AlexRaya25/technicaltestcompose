@@ -56,6 +56,14 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation(libs.androidx.hilt.navigation.compose)
 
+    //Coil
+    implementation(libs.coil)
+    implementation(libs.coil.compose)
+
+    //Icon
+    implementation(libs.androidx.material.icons.extended)
+
+
 }
 
 kapt {
