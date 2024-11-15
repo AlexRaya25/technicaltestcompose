@@ -9,28 +9,32 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Color(0xFFBB86FC),          // Soft purple for primary elements
+    onPrimary = Color.Black,               // Black text/icons on primary background
+    primaryContainer = Color(0xFF3700B3),  // Darker purple for primary containers
+    secondary = Color(0xFF03DAC6),         // Teal accent
+    onSecondary = Color.Black,             // Black text/icons on secondary background
+    background = Color(0xFF121212),        // Dark background for dark theme
+    onBackground = Color(0xFFE0E0E0),      // Light text on dark background
+    surface = Color(0xFF1E1E1E),           // Dark surface for cards
+    onSurface = Color(0xFFE0E0E0),         // Light text/icons on surface
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = Color(0xFF6200EE),        // Profundo y vibrante
     onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    secondary = Color(0xFF03DAC5),      // Suave para los botones de acción secundaria
+    onSecondary = Color.Black,
+    background = Color(0xFFF6F6F6),     // Fondo claro y cálido
+    onBackground = Color(0xFF1C1B1F),   // Texto oscuro para legibilidad
+    surface = Color(0xFFFFFFFF),        // Superficies limpias y contrastadas
+    onSurface = Color(0xFF333333),      // Texto en superficie
+    tertiary = Color(0xFFFFA726),       // Acento para algunos íconos o detalles
+    onTertiary = Color.Black,
 )
 
 @Composable
@@ -45,7 +49,6 @@ fun TechnicaltestcomposeTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

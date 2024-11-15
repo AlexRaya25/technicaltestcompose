@@ -63,6 +63,7 @@ dependencies {
     //Icon
     implementation(libs.androidx.material.icons.extended)
 
+    implementation (libs.androidx.animation)
 
 }
 

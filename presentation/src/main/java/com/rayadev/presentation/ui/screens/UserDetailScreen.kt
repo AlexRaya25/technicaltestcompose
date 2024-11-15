@@ -1,100 +1,183 @@
 package com.rayadev.presentation.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.BoundsTransform
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apartment
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PhoneIphone
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.rayadev.presentation.R
 import com.rayadev.presentation.viewmodel.UserViewModel
-import kotlin.math.roundToInt
 import androidx.compose.foundation.layout.Column as Column
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun UserDetailScreen(userId: Int, imagePosition: Offset, imageSize: IntSize, userViewModel: UserViewModel = hiltViewModel()) {
+fun SharedTransitionScope.UserDetailScreen(
+    userId: Int,
+    userViewModel: UserViewModel = hiltViewModel(),
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    boundsTransform: BoundsTransform
+) {
     val user by userViewModel.getUserById(userId).collectAsState(initial = null)
 
-    val targetOffset = remember { Animatable(imagePosition) }
-    val targetWidth = remember { Animatable(imageSize.width.toFloat()) }
-    val targetHeight = remember { Animatable(imageSize.height.toFloat()) }
-
-    LaunchedEffect(userId) {
-        targetOffset.animateTo(Offset(0f, 0f), animationSpec = tween(800))
-
-        targetWidth.animateTo(150f, animationSpec = tween(800))
-        targetHeight.animateTo(150f, animationSpec = tween(800))
-    }
-
-    // Asegúrate de que la imagen solo se dibuje cuando el usuario esté disponible
-    AnimatedVisibility(visible = user != null) {
-        user?.let {
+    if (user != null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .sharedElement(
+                    rememberSharedContentState(key = "card-${user!!.id}"),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = boundsTransform
+                ),
+            contentAlignment = Alignment.TopCenter
+        ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-                    .animateContentSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter(it.avatar),
-                    contentDescription = "Avatar de ${it.first_name} ${it.last_name}",
+                    painter = rememberAsyncImagePainter(user!!.avatar),
+                    contentDescription = null,
                     modifier = Modifier
-                        .offset { IntOffset(targetOffset.value.x.roundToInt(), targetOffset.value.y.roundToInt()) }
-                        .size(targetWidth.value.dp, targetHeight.value.dp) // Usando los valores animados
-                        .clip(CircleShape)
-                        .background(Color.LightGray)
-                        .animateEnterExit(
-                            enter = fadeIn(animationSpec = tween(500)),
-                            exit = fadeOut(animationSpec = tween(500))
+                        .size(120.dp)
+                        .sharedElement(
+                            rememberSharedContentState(key = "image-${user!!.id}"),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = boundsTransform
                         )
+                        .clip(CircleShape)
+                        .background(Color.Transparent)
                 )
+
                 Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
-                    text = "${it.first_name} ${it.last_name}",
-                    style = MaterialTheme.typography.headlineMedium,
+                    text = "${user!!.first_name} ${user!!.last_name}",
+                    style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold
                 )
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
-                    text = it.email,
-                    style = MaterialTheme.typography.bodyLarge
+                    text = user!!.email,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
                 )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Divider(
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    UserDetailRow(iconRes = Icons.Default.PhoneIphone, label = "Teléfono", value = "+34 123 456 789")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    UserDetailRow(iconRes = Icons.Default.LocationOn, label = "Ubicación", value = "Madrid, España")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    UserDetailRow(iconRes = Icons.Default.Apartment, label = "Compañía", value = "Rayadev")
+                }
+
+                // Línea divisora
+                Divider(
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Sobre ${user!!.first_name}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                    }
+                }
             }
+        }
+    }
+}
+
+@Composable
+fun UserDetailRow(iconRes: ImageVector, label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = iconRes,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(text = label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+            Text(text = value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f))
         }
     }
 }

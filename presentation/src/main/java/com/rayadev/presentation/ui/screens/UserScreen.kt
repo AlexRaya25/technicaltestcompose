@@ -1,226 +1,247 @@
 package com.rayadev.presentation.ui.screens
 
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.BoundsTransform
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.material.icons.filled.ViewList
+import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.rayadev.domain.model.User
-import com.rayadev.presentation.R
 import com.rayadev.presentation.viewmodel.UserViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun UserScreen(
     userViewModel: UserViewModel = hiltViewModel(),
-    onUserClick: (Int, Offset, IntSize) -> Unit) {
-
+    onUserClick: (Int) -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    boundsTransform: BoundsTransform
+) {
     val users by userViewModel.users.collectAsState()
     val currentPage by userViewModel.currentPage.collectAsState()
-    var isGrid by remember { mutableStateOf(false) }
-
-    val errorState by userViewModel.errorState.collectAsState()
-    if (errorState != null) {
-        Text(text = errorState ?: "Unknown error", color = Color.Red)
-    }
+    val isGridView by userViewModel.isGridView.collectAsState()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "Usuarios", fontWeight = FontWeight.Bold)
-                },
-                actions = {
-                    IconButton(onClick = { isGrid = !isGrid }) {
-                        Icon(
-                            imageVector = if (isGrid) Icons.Rounded.GridView else Icons.Filled.ViewList,
-                            contentDescription = "Cambiar vista"
-                        )
-                    }
-                }
+        topBar = { UserTopAppBar(isGridView, userViewModel) },
+        content = { paddingValues ->
+            UserContent(
+                users = users,
+                currentPage = currentPage,
+                isGridView = isGridView,
+                onUserClick = onUserClick,
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = boundsTransform,
+                paddingValues = paddingValues,
+                userViewModel = userViewModel
             )
         }
-    ) { paddingValues ->
-        if (users.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UserTopAppBar(isGridView: Boolean, userViewModel: UserViewModel) {
+    TopAppBar(
+        title = { Text(text = "Usuarios", fontWeight = FontWeight.Bold) },
+        actions = {
+            IconButton(onClick = { userViewModel.toggleView() }) {
+                Icon(
+                    imageVector = if (isGridView) Icons.Rounded.GridView else Icons.Filled.ViewList,
+                    contentDescription = "Cambiar vista"
+                )
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                if (isGrid) {
-                    items(users.chunked(2)) { rowUsers ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            for (user in rowUsers) {
-                                UserGridItem(user, Modifier.weight(1f), onClick = {
-                                    onUserClick(user.id, Offset(0f, 0f), IntSize(56, 56)) // Aquí pasas los valores correctos
-                                })
-                            }
-                            if (rowUsers.size < 2) {
-                                Spacer(modifier = Modifier.weight(1f))
-                            }
-                        }
-                    }
-                } else {
-                    items(users) { user ->
-                        UserItem(user = user, onClick = {
-                            onUserClick(user.id, Offset(0f, 0f), IntSize(56, 56)) // Aquí pasas los valores correctos
-                        })
-                    }
-                }
-                item {
-                    PaginationControls(
-                        currentPage = currentPage,
-                        onNextPage = { userViewModel.nextPage() },
-                        onPreviousPage = { userViewModel.previousPage() },
-                        canGoToNextPage = userViewModel.canGoToNextPage(),
-                        canGoToPreviousPage = userViewModel.canGoToPreviousPage()
-                    )
-                }
-            }
+        }
+    )
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun UserContent(
+    users: List<User>,
+    currentPage: Int,
+    isGridView: Boolean,
+    onUserClick: (Int) -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    boundsTransform: BoundsTransform,
+    paddingValues: PaddingValues,
+    userViewModel: UserViewModel
+) {
+    if (users.isEmpty()) {
+        LoadingIndicator()
+    } else {
+        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            UserListOrGridView(
+                users = users,
+                isGridView = isGridView,
+                onUserClick = onUserClick,
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = boundsTransform
+            )
+            PaginationControls(
+                currentPage = currentPage,
+                onNextPage = { userViewModel.nextPage() },
+                onPreviousPage = { userViewModel.previousPage() },
+                canGoToNextPage = userViewModel.canGoToNextPage(),
+                canGoToPreviousPage = userViewModel.canGoToPreviousPage()
+            )
         }
     }
 }
 
 @Composable
-fun UserItem(user: User, onClick: (Int) -> Unit) {
-    var transitionState = remember { MutableTransitionState(false) }
-    var imagePosition by remember { mutableStateOf(Offset(0f, 0f)) }
-    var imageSize by remember { mutableStateOf(IntSize(0, 0)) }
+fun LoadingIndicator() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
+}
 
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun UserListOrGridView(
+    users: List<User>,
+    isGridView: Boolean,
+    onUserClick: (Int) -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    boundsTransform: BoundsTransform
+) {
+    if (isGridView) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.weight(1f).fillMaxSize().padding(horizontal = 8.dp)
+        ) {
+            items(users) { user ->
+                UserGridItem(
+                    user = user,
+                    onUserClick = onUserClick,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = boundsTransform
+                )
+            }
+        }
+    } else {
+        LazyColumn(modifier = Modifier.weight(1f).fillMaxSize()) {
+            items(users) { user ->
+                UserListItem(
+                    user = user,
+                    onUserClick = onUserClick,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = boundsTransform
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun UserListItem(
+    user: User,
+    onUserClick: (Int) -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    boundsTransform: BoundsTransform
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable {
-                transitionState.targetState = true
-                onClick(user.id)
-            }
-            .onGloballyPositioned { layoutCoordinates ->
-                imagePosition = layoutCoordinates.positionInWindow()
-                imageSize = layoutCoordinates.size
-            },
-        shape = RoundedCornerShape(8.dp)
+            .clickable { onUserClick(user.id) }
+            .sharedElement(
+                rememberSharedContentState(key = "card-${user.id}"),
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = boundsTransform
+            ),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        elevation = CardDefaults.cardElevation(6.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AnimatedVisibility(
-                visibleState = transitionState,
-                enter = fadeIn(animationSpec = tween(500)) + slideInHorizontally(),
-                exit = fadeOut(animationSpec = tween(500)) + slideOutHorizontally()
-            ) {
-                Image(
-                    painter = rememberAsyncImagePainter(user.avatar),
-                    contentDescription = "Avatar de ${user.first_name} ${user.last_name}",
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(Color.LightGray)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "${user.first_name} ${user.last_name}",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = user.email,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
+        UserCardContent(user, animatedVisibilityScope, boundsTransform)
     }
 }
 
-
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun UserGridItem(user: User, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun UserGridItem(
+    user: User,
+    onUserClick: (Int) -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    boundsTransform: BoundsTransform
+) {
     Card(
-        modifier = modifier
+        modifier = Modifier
             .aspectRatio(1f)
             .padding(8.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp)
+            .clickable { onUserClick(user.id) }
+            .sharedElement(
+                rememberSharedContentState(key = "card-${user.id}"),
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = boundsTransform
+            ),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
     ) {
-        Column(
+        UserCardContent(user, animatedVisibilityScope, boundsTransform)
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun UserCardContent(
+    user: User,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    boundsTransform: BoundsTransform
+) {
+    Row(modifier = Modifier.padding(16.dp)) {
+        Image(
             modifier = Modifier
-                .padding(8.dp)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(user.avatar)
-                        .placeholder(R.drawable.ic_launcher_background)
-                        .error(R.drawable.ic_launcher_foreground)
-                        .crossfade(true)
-                        .build()
+                .size(56.dp)
+                .background(Color.Transparent)
+                .clip(CircleShape)
+                .sharedElement(
+                    rememberSharedContentState(key = "image-${user.id}"),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = boundsTransform
                 ),
-                contentDescription = "Avatar de ${user.first_name} ${user.last_name}",
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            contentScale = ContentScale.Crop,
+            painter = rememberAsyncImagePainter(user.avatar),
+            contentDescription = "Avatar"
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
             Text(
                 text = "${user.first_name} ${user.last_name}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = user.email, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -236,18 +257,39 @@ fun PaginationControls(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .background(Color.Transparent)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(onClick = onPreviousPage, enabled = canGoToPreviousPage) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Página Anterior")
+        IconButton(
+            onClick = onPreviousPage,
+            enabled = canGoToPreviousPage,
+            colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Página Anterior",
+                tint = if (canGoToPreviousPage) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            )
         }
 
-        Text(text = "Página $currentPage", fontWeight = FontWeight.Bold)
+        Text(
+            text = "Página $currentPage",
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
 
-        IconButton(onClick = onNextPage, enabled = canGoToNextPage) {
-            Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Página Siguiente")
+        IconButton(
+            onClick = onNextPage,
+            enabled = canGoToNextPage,
+            colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowForward,
+                contentDescription = "Página Siguiente",
+                tint = if (canGoToNextPage) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            )
         }
     }
 }

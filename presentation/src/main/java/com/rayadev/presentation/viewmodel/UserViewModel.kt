@@ -27,6 +27,9 @@ class UserViewModel @Inject constructor(
     private val _currentPage = MutableStateFlow(1)
     val currentPage: StateFlow<Int> = _currentPage
 
+    private val _isGridView = MutableStateFlow(false)
+    val isGridView: StateFlow<Boolean> get() = _isGridView
+
     private val perPage = 6
     private var totalPages = 1
 
@@ -72,4 +75,9 @@ class UserViewModel @Inject constructor(
 
     fun canGoToNextPage(): Boolean = _currentPage.value < totalPages
     fun canGoToPreviousPage(): Boolean = _currentPage.value > 1
+
+    fun toggleView() {
+        _isGridView.value = !_isGridView.value
+    }
+
 }
