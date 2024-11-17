@@ -3,6 +3,7 @@ package com.rayadev.presentation.ui.screens
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -96,7 +97,9 @@ fun UserContent(
     if (users.isEmpty()) {
         LoadingIndicator()
     } else {
-        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
             UserListOrGridView(
                 users = users,
                 isGridView = isGridView,
@@ -134,10 +137,12 @@ fun UserListOrGridView(
     if (isGridView) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            modifier = Modifier.weight(1f).fillMaxSize().padding(horizontal = 8.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp)
         ) {
             items(users) { user ->
-                UserGridItem(
+                this@SharedTransitionScope.UserGridItem(
                     user = user,
                     onUserClick = onUserClick,
                     animatedVisibilityScope = animatedVisibilityScope,
@@ -146,9 +151,13 @@ fun UserListOrGridView(
             }
         }
     } else {
-        LazyColumn(modifier = Modifier.weight(1f).fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp)
+        ) {
             items(users) { user ->
-                UserListItem(
+                this@SharedTransitionScope.UserListItem(
                     user = user,
                     onUserClick = onUserClick,
                     animatedVisibilityScope = animatedVisibilityScope,
@@ -161,7 +170,7 @@ fun UserListOrGridView(
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun UserListItem(
+fun SharedTransitionScope.UserListItem(
     user: User,
     onUserClick: (Int) -> Unit,
     animatedVisibilityScope: AnimatedVisibilityScope,
@@ -187,7 +196,7 @@ fun UserListItem(
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun UserGridItem(
+fun SharedTransitionScope.UserGridItem(
     user: User,
     onUserClick: (Int) -> Unit,
     animatedVisibilityScope: AnimatedVisibilityScope,
@@ -213,7 +222,7 @@ fun UserGridItem(
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun UserCardContent(
+fun SharedTransitionScope.UserCardContent(
     user: User,
     animatedVisibilityScope: AnimatedVisibilityScope,
     boundsTransform: BoundsTransform
@@ -222,7 +231,6 @@ fun UserCardContent(
         Image(
             modifier = Modifier
                 .size(56.dp)
-                .background(Color.Transparent)
                 .clip(CircleShape)
                 .sharedElement(
                     rememberSharedContentState(key = "image-${user.id}"),
@@ -257,38 +265,30 @@ fun PaginationControls(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Transparent)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         IconButton(
             onClick = onPreviousPage,
-            enabled = canGoToPreviousPage,
-            colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
+            enabled = canGoToPreviousPage
         ) {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Página Anterior",
-                tint = if (canGoToPreviousPage) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                contentDescription = "Página Anterior"
             )
         }
-
         Text(
             text = "Página $currentPage",
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            fontWeight = FontWeight.Bold
         )
-
         IconButton(
             onClick = onNextPage,
-            enabled = canGoToNextPage,
-            colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
+            enabled = canGoToNextPage
         ) {
             Icon(
                 imageVector = Icons.Filled.ArrowForward,
-                contentDescription = "Página Siguiente",
-                tint = if (canGoToNextPage) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                contentDescription = "Página Siguiente"
             )
         }
     }
