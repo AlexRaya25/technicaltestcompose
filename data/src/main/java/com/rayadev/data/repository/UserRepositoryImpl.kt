@@ -4,13 +4,11 @@ import com.rayadev.data.local.UserDao
 import com.rayadev.data.mapper.toDomain
 import com.rayadev.data.mapper.toEntity
 import com.rayadev.data.remote.ApiService
-import com.rayadev.domain.model.User
 import com.rayadev.domain.model.UserResponse
 import com.rayadev.domain.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.ceil
 
 class UserRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
@@ -27,9 +25,5 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             throw e
         }
-    }
-
-    private suspend fun insertUsers(users: List<User>) {
-        userDao.insertUsers(users.map { it.toEntity() })
     }
 }
