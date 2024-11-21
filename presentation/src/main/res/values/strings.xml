@@ -1,3 +1,30 @@
 <resources>
     <string name="app_name">technicaltestcompose</string>
+
+    <!-- Error messages -->
+    <string name="error_no_internet">No internet connection.</string>
+    <string name="error_timeout">The connection timed out.</string>
+    <string name="error_loading_data">Error loading data.</string>
+    <string name="error_refreshing_data">Error refreshing data.</string>
+
+    <!-- Pagination controls -->
+    <string name="pagination_previous_page">Previous Page</string>
+    <string name="pagination_next_page">Next Page</string>
+    <string name="pagination_page_number">Page %1$d</string>
+
+    <!-- User Screen -->
+    <string name="avatar">Avatar</string>
+    <string name="change_view">Change View</string>
+    <string name="users">Users</string>
+
+    <!-- User Detail Screen -->
+    <string name="telephone">Telephone</string>
+    <string name="location">Location</string>
+    <string name="company">Company</string>
+    <string name="telephone_txt">+34 123 456 789</string>
+    <string name="location_txt">Madrid, Spain</string>
+    <string name="company_txt">Rayadev</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
+    <string name="user_detail_title">About %1$s</string>
+
 </resources>

@@ -1,4 +1,4 @@
-package com.rayadev.presentation.ui.components.UserDetailScreen
+package com.rayadev.presentation.ui.components.userDetailScreen
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.BoundsTransform

@@ -1,4 +1,4 @@
-package com.rayadev.presentation.ui.components.UserDetailScreen
+package com.rayadev.presentation.ui.components.userDetailScreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +11,9 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PhoneIphone
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.rayadev.presentation.R
 
 @Composable
 fun UserDetailsSection() {
@@ -20,10 +22,10 @@ fun UserDetailsSection() {
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
-        UserDetailRow(Icons.Default.PhoneIphone, "Teléfono", "+34 123 456 789")
+        UserDetailRow(Icons.Default.PhoneIphone, stringResource(id = R.string.telephone), stringResource(id = R.string.telephone_txt))
         Spacer(modifier = Modifier.height(16.dp))
-        UserDetailRow(Icons.Default.LocationOn, "Ubicación", "Madrid, España")
+        UserDetailRow(Icons.Default.LocationOn, stringResource(id = R.string.location), stringResource(id = R.string.location_txt))
         Spacer(modifier = Modifier.height(16.dp))
-        UserDetailRow(Icons.Default.Apartment, "Compañía", "Rayadev")
+        UserDetailRow(Icons.Default.Apartment, stringResource(id = R.string.company), stringResource(id = R.string.company_txt))
     }
 }

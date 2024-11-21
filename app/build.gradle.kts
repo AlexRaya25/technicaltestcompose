@@ -76,6 +76,11 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation(libs.androidx.hilt.navigation.compose)
 
+    //Room
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
+    kapt("androidx.room:room-compiler:2.6.1")
+
     //Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

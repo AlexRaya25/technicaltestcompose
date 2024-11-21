@@ -1,4 +1,4 @@
-package com.rayadev.presentation.ui.components.UserScreen
+package com.rayadev.presentation.ui.components.userScreen
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.BoundsTransform
@@ -22,11 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.rayadev.domain.model.User
+import com.rayadev.presentation.R
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -55,17 +57,25 @@ fun SharedTransitionScope.UserCardContent(
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
                 painter = rememberAsyncImagePainter(user.avatar),
-                contentDescription = "Avatar"
+                contentDescription = stringResource(id = R.string.avatar)
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "${user.first_name} ${user.last_name}",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = user.first_name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = user.last_name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp
+                )
+            }
         }
-    } else { // typeItem == "UserListItem"
+    } else {
         Row(modifier = Modifier.padding(16.dp)) {
             Image(
                 modifier = Modifier
@@ -78,7 +88,7 @@ fun SharedTransitionScope.UserCardContent(
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
                 painter = rememberAsyncImagePainter(user.avatar),
-                contentDescription = "Avatar"
+                contentDescription = stringResource(id = R.string.avatar)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {

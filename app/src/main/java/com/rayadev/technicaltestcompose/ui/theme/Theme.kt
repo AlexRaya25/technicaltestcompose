@@ -1,6 +1,5 @@
 package com.rayadev.technicaltestcompose.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -13,29 +12,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFFBB86FC),          // Soft purple for primary elements
-    onPrimary = Color.Black,               // Black text/icons on primary background
-    primaryContainer = Color(0xFF3700B3),  // Darker purple for primary containers
-    secondary = Color(0xFF03DAC6),         // Teal accent
-    onSecondary = Color.Black,             // Black text/icons on secondary background
-    background = Color(0xFF121212),        // Dark background for dark theme
-    onBackground = Color(0xFFE0E0E0),      // Light text on dark background
-    surface = Color(0xFF1E1E1E),           // Dark surface for cards
-    onSurface = Color(0xFFE0E0E0),         // Light text/icons on surface
+    primary = Color(0xFF4A90E2),
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFF2A75D0),
+    secondary = Color(0xFF50E3C2),
+    onSecondary = Color.Black,
+    background = Color(0xFF1C1C1C),
+    onBackground = Color.White,
+    surface = Color(0xFF464545),
+    onSurface = Color.White,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF6200EE),        // Profundo y vibrante
+    primary = Color(0xFF0077B6),
     onPrimary = Color.White,
-    secondary = Color(0xFF03DAC5),      // Suave para los botones de acción secundaria
+    secondary = Color(0xFF7FDBDA),
     onSecondary = Color.Black,
-    background = Color(0xFFF6F6F6),     // Fondo claro y cálido
-    onBackground = Color(0xFF1C1B1F),   // Texto oscuro para legibilidad
-    surface = Color(0xFFFFFFFF),        // Superficies limpias y contrastadas
-    onSurface = Color(0xFF333333),      // Texto en superficie
-    tertiary = Color(0xFFFFA726),       // Acento para algunos íconos o detalles
+    background = Color(0xFFF5F5F5),
+    onBackground = Color(0xFF333333),
+    surface = Color(0xFFFFFFFF),
+    onSurface = Color(0xFF333333),
+    tertiary = Color(0xFF69A3FF),
     onTertiary = Color.Black,
 )
+
 
 @Composable
 fun TechnicaltestcomposeTheme(

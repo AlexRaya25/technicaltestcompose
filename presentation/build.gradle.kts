@@ -53,6 +53,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.ui.tooling.preview.android)
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation(libs.androidx.hilt.navigation.compose)
 
@@ -64,6 +65,10 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
 
     implementation (libs.androidx.animation)
+
+    implementation (libs.androidx.foundation)
+    implementation (libs.accompanist.swiperefresh)
+    implementation (libs.accompanist.placeholder.material)
 
 }
 

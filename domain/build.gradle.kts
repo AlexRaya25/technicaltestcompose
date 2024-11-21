@@ -12,5 +12,12 @@ dependencies {
     implementation(kotlin("stdlib-jdk7"))
 
     // Pruebas unitarias
+    testImplementation (libs.mockito.core)
+
+    // Test dependencies
+
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.inline)
 }

@@ -1,6 +1,5 @@
 package com.rayadev.domain.usecase
 
-import com.rayadev.domain.model.User
 import com.rayadev.domain.model.UserResponse
 import com.rayadev.domain.repository.UserRepository
 

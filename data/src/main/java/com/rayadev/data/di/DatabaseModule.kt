@@ -3,8 +3,8 @@ package com.rayadev.data.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
-import com.rayadev.data.local.AppDatabase
 import com.rayadev.data.local.UserDao
+import com.rayadev.data.local.database.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,7 +29,6 @@ object DatabaseModule {
             AppDatabase::class.java,
             "user_database"
         )
-            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -37,4 +36,6 @@ object DatabaseModule {
     fun provideUserDao(database: AppDatabase): UserDao {
         return database.userDao()
     }
+
 }
+

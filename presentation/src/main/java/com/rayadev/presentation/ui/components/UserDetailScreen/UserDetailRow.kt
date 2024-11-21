@@ -1,4 +1,4 @@
-package com.rayadev.presentation.ui.components.UserDetailScreen
+package com.rayadev.presentation.ui.components.userDetailScreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

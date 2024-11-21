@@ -1,4 +1,4 @@
-package com.rayadev.presentation.ui.components.UserScreen
+package com.rayadev.presentation.ui.components.userScreen
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.BoundsTransform
@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.rayadev.domain.model.User
 import com.rayadev.presentation.viewmodel.UserViewModel
@@ -25,32 +23,38 @@ fun SharedTransitionScope.UserContent(
     animatedVisibilityScope: AnimatedVisibilityScope,
     boundsTransform: BoundsTransform,
     paddingValues: PaddingValues,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    isLoading: Boolean,
+    errorState: String,
+    fromDetail: Boolean
 ) {
-    if (users.isEmpty()) {
-        LoadingIndicator()
-    } else {
-        UserListOrGridView(
-            users = users,
-            isGridView = isGridView,
-            onUserClick = onUserClick,
-            animatedVisibilityScope = animatedVisibilityScope,
-            boundsTransform = boundsTransform,
-            modifier = Modifier
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (!isLoading && errorState.isEmpty()) {
+            UserListOrGridView(
+                users = users,
+                isGridView = isGridView,
+                onUserClick = onUserClick,
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = boundsTransform,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                currentPage = currentPage,
+                onNextPage = { userViewModel.nextPage() },
+                onPreviousPage = { userViewModel.previousPage() },
+                canGoToNextPage = userViewModel.canGoToNextPage(),
+                canGoToPreviousPage = userViewModel.canGoToPreviousPage(),
+                errorState = errorState,
+                fromDetail = fromDetail
+            )
+        } else {
+            ShimmerLoading(
+                isGridView,
+                modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            currentPage = currentPage,
-            onNextPage = { userViewModel.nextPage() },
-            onPreviousPage = { userViewModel.previousPage() },
-            canGoToNextPage = userViewModel.canGoToNextPage(),
-            canGoToPreviousPage = userViewModel.canGoToPreviousPage()
-        )
+                .padding(paddingValues))
+        }
     }
 }
 
-@Composable
-fun LoadingIndicator() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
-}

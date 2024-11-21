@@ -1,4 +1,4 @@
-package com.rayadev.presentation.ui.components.UserScreen
+package com.rayadev.presentation.ui.components.userScreen
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.BoundsTransform
@@ -36,7 +36,9 @@ fun SharedTransitionScope.UserListItem(
                 boundsTransform = boundsTransform
             ),
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         UserCardContent("UserListItem", user, animatedVisibilityScope, boundsTransform)
