@@ -58,8 +58,8 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
 
     //Coil
-    implementation(libs.coil)
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     //Icon
     implementation(libs.androidx.material.icons.extended)

@@ -42,7 +42,7 @@ class GetUserUseCaseTest {
     fun `given repository throws exception when invoke is called, then return failure result`() = runTest {
         val page = 1
         val perPage = 10
-        val mockException = Exception("Error fetching users")
+        val mockException = IllegalStateException("Error fetching users")
 
         `when`(userRepository.getUsers(page, perPage)).thenThrow(mockException)
 

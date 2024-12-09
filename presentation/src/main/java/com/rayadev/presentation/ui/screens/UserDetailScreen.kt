@@ -34,7 +34,8 @@ fun SharedTransitionScope.UserDetailScreen(
             UserDetailContent(
                 user = userDetails,
                 animatedVisibilityScope = animatedVisibilityScope,
-                boundsTransform = boundsTransform
+                boundsTransform = boundsTransform,
+                onNavigateBack = onNavigateBack
             )
         }
     }
