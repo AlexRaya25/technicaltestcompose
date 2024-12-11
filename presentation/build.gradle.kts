@@ -58,8 +58,10 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
 
     //Coil
+    implementation(libs.coil)
     implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
+    implementation ("com.squareup.picasso:picasso:2.8")
+
 
     //Icon
     implementation(libs.androidx.material.icons.extended)

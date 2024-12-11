@@ -27,13 +27,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.ImageLoader
-import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
-import coil3.request.crossfade
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
 import com.rayadev.domain.model.User
 import com.rayadev.presentation.R
 import okhttp3.OkHttpClient
+import java.security.SecureRandom
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -44,27 +46,32 @@ fun SharedTransitionScope.UserCardContent(
     boundsTransform: BoundsTransform
 ) {
 
+    val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+        override fun checkClientTrusted(
+            p0: Array<out java.security.cert.X509Certificate>?,
+            authType: String?
+        ) {}
+        override fun checkServerTrusted(
+            p0: Array<out java.security.cert.X509Certificate>?,
+            authType: String?
+        ) {}
+        override fun getAcceptedIssuers(): Array<out java.security.cert.X509Certificate>? = arrayOf()
+    })
+
+    val sslContext = SSLContext.getInstance("TLS").apply {
+        init(null, trustAllCerts, SecureRandom())
+    }
+
     val imageLoader = ImageLoader.Builder(LocalContext.current)
         .okHttpClient {
             OkHttpClient.Builder()
-                .addInterceptor { chain ->
-                    val request = chain.request().newBuilder()
-                        .header("User-Agent", "Mozilla/5.0")
-                        .build()
-                    chain.proceed(request)
-                }
+                .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
+                .hostnameVerifier { _, _ -> true }
                 .build()
         }
         .crossfade(true)
         .build()
 
-    // Crear el painter con el ImageLoader configurado
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data("https://i.pinimg.com/236x/d5/39/17/d539174e175e07e8a374616766a44750.jpg") // Cambia la URL según sea necesario
-            .build(),
-        imageLoader = imageLoader
-    )
 
     if (typeItem == "UserGridItem") {
         Column(
@@ -75,6 +82,10 @@ fun SharedTransitionScope.UserCardContent(
             verticalArrangement = Arrangement.Center
         ) {
             Image(
+                painter = rememberAsyncImagePainter(
+                    model = user.avatar,
+                    imageLoader = imageLoader
+                ),
                 modifier = Modifier
                     .size(80.dp)
                     .sharedElement(
@@ -83,7 +94,6 @@ fun SharedTransitionScope.UserCardContent(
                         boundsTransform = boundsTransform
                     )
                     .clip(CircleShape),
-                painter = rememberAsyncImagePainter("https://i.pinimg.com/236x/d5/39/17/d539174e175e07e8a374616766a44750.jpg"),
                 contentScale = ContentScale.Crop,
                 contentDescription = stringResource(id = R.string.avatar)
             )
@@ -115,7 +125,10 @@ fun SharedTransitionScope.UserCardContent(
                     )
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
-                painter = rememberAsyncImagePainter("https://reqres.in/img/faces/1-image.jpg"),
+                painter = rememberAsyncImagePainter(
+                    model = user.avatar,
+                    imageLoader = imageLoader
+                ),
                 contentDescription = stringResource(id = R.string.avatar)
             )
             Spacer(modifier = Modifier.width(16.dp))
